@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -59,8 +60,7 @@ namespace RubricaTelefonicaAziendale.Controllers
         public async Task<ActionResult<AuthDto>> WhoAmI()
         {
             JwtTokenClaims? jtc = service.WhoAmI();
-            if (jtc == null)
-                return Problem("Token is not valid or expired");
+            if (jtc == null) return Problem("Token is not valid or expired");
             Users? user = await service.GetUserById(jtc!.UserId ?? "");
             if (user != null)
             {
@@ -83,61 +83,98 @@ namespace RubricaTelefonicaAziendale.Controllers
         [ProducesDefaultResponseType]
         public async Task<ActionResult<AuthDto>> Register([FromBody] UserDto model)
         {
-            await Task.Delay(1000);
-            // if (!ModelState.IsValid)
-            // {
-            //     var errors = (from item in ModelState where item.Value.Errors.Any() select item.Value.Errors[0].ErrorMessage).ToList();
-            //     return BadRequest(new InfoMessage(MessageType.Error, 400, "Problems with received data!", String.Join(";", errors.ToArray())));
-            // }
-            // if (String.IsNullOrEmpty(model.Username) || String.IsNullOrEmpty(model.Password))
-            // {
-            //     return BadRequest(new InfoMessage(MessageType.Error, 400, "Error", "Invalid Username or Password"));
-            // }
-            // if (String.IsNullOrEmpty(model.Email))
-            // {
-            //     return BadRequest(new InfoMessage(MessageType.Error, 400, "Error", "Invalid email address"));
-            // }
-            // bool usernameexist = await service.ExistUserWithUsername(model.Username);
-            // if (usernameexist)
-            // {
-            //     return BadRequest(new InfoMessage(MessageType.Error, 400, "Error", "Username not available"));
-            // }
-            // bool emailexist = await service.ExistUserWithEmail(model.Email);
-            // if (emailexist)
-            // {
-            //     return BadRequest(new InfoMessage(MessageType.Error, 400, "Error", "Email already in use! Try to recover your credentials instead of creating a new user"));
-            // }
-            // Users newuser = new()
-            // {
-            //     Id = new Guid().ToString(),
-            //     Firstname = model.Firstname,
-            //     Lastname = model.Lastname,
-            //     Username = model.Username,
-            //     Password = model.Password,
-            //     Email = model.Email,
-            // };
-            // if (model?.Role == null) return BadRequest(new InfoMessage(MessageType.Error, 400, "Error", "Role not valid!"));
-            // Roles? role = await service.GetRoleByDesc(model.Role);
-            // if (role == null)
-            // {
-            //     return BadRequest(new InfoMessage(MessageType.Error, 400, "Error", "Role not valid!"));
-            // }
-            // Users? user = await service.Register(newuser, role);
-            // if (user != null)
-            // {
-            //     var jwt = service.GenerateToken(user, role);
-            //     return Ok(new LoginResponse()
-            //     {
-            //         Username = user.Username,
-            //         Fullname = user.Firstname + " " + user!.Lastname,
-            //         Email = user.Email ?? "",
-            //         Picture = DefaultPicture,
-            //         Role = role.Description ?? "",
-            //         Token = jwt,
-            //     });
-            // }
-            // else 
-            return Problem("Username and password are not valid. Please contact the administrator!");
+            if (!ModelState.IsValid)
+            {
+                var errors = (from item in ModelState where item.Value.Errors.Any() select item.Value.Errors[0].ErrorMessage).ToList();
+                return BadRequest("Problems with received data! " + String.Join(";", errors.ToArray()));
+            }
+            if (String.IsNullOrEmpty(model.Username) || String.IsNullOrEmpty(model.Password))
+            {
+                return BadRequest("Invalid Username or Password");
+            }
+            bool usernameexist = await service.ExistUserWithUsername(model.Username);
+            if (usernameexist)
+            {
+                return BadRequest("Username not available");
+            }
+            try
+            {
+                // calcolo la password
+                GeneratePasswordHash(model.Password, out string salt, out string hash);
+                // creo un nuovo utente
+                Users newuser = new Users()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Firstname = model.Firstname ?? "",
+                    Lastname = model.Lastname ?? "",
+                    Username = model.Username,
+                    Password = hash,
+                    Salt = salt
+                };
+                // individuo il ruolo da assegnare all'utente
+                if (model?.Role == null) return BadRequest("Role not valid!");
+                Roles? role = await service.GetRoleByDesc(model.Role);
+                if (role == null) return BadRequest("Role not found!");
+                await service.Register(newuser, role);
+                return Ok("User created!");
+            }
+            catch (Exception ex)
+            {
+                return Problem("Error creating user! " + ex.Message);
+            }
+        }
+
+
+        [HttpPost("update")]
+        [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult<AuthDto>> Update([FromBody] UserDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = (from item in ModelState where item.Value.Errors.Any() select item.Value.Errors[0].ErrorMessage).ToList();
+                return BadRequest("Problems with received data! " + String.Join(";", errors.ToArray()));
+            }
+            if (String.IsNullOrEmpty(model.Username) || String.IsNullOrEmpty(model.Password))
+            {
+                return BadRequest("Invalid Username or Password");
+            }
+            bool usernameexist = await service.ExistUserWithUsername(model.Username);
+            if (usernameexist)
+            {
+                return BadRequest("Username not available");
+            }
+            try
+            {
+                // cerco l'utente
+                Users? updateuser = await service.GetUserById(model.Id);
+                if (updateuser == null)
+                {
+                    return BadRequest("User not found!");
+                }
+                updateuser.Id = Guid.NewGuid().ToString();
+                updateuser.Firstname = model.Firstname ?? "";
+                updateuser.Lastname = model.Lastname ?? "";
+                updateuser.Username = model.Username;
+                // calcolo la password
+                if (!String.IsNullOrEmpty(model.Password))
+                {
+                    GeneratePasswordHash(model.Password, out string salt, out string hash);
+                    updateuser.Password = hash;
+                    updateuser.Salt = salt;
+                }
+                // individuo il ruolo da assegnare all'utente
+                if (model?.Role == null) return BadRequest("Role not valid!");
+                Roles? role = await service.GetRoleByDesc(model.Role);
+                if (role == null) return BadRequest("Role not found!");
+                await service.Register(updateuser, role);
+                return Ok("User updated!");
+            }
+            catch (Exception ex)
+            {
+                return Problem("Error creating user! " + ex.Message);
+            }
         }
 
 
@@ -166,43 +203,6 @@ namespace RubricaTelefonicaAziendale.Controllers
         }
 
 
-        [HttpGet("setusers")]
-        [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
-        [ProducesDefaultResponseType]
-        public async Task<ActionResult> SetUsers()
-        {
-            GeneratePasswordHash("tjf", out string salt, out string hash);
-            Users user = new Users()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Firstname = "TJF-Challenge",
-                Lastname = "Admin",
-                Username = "tjf",
-                Password = hash,
-                Salt = salt,
-                Picture = null
-            };
-            Roles role = await service.GetRoleByDesc("Admin");
-
-            await service.Register(user, role);
-
-            user = new Users()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Firstname = "TJF-Challenge",
-                Lastname = "User",
-                Username = "tjf",
-                Password = hash,
-                Salt = salt,
-                Picture = null
-            };
-            role = await service.GetRoleByDesc("User");
-
-            await service.Register(user, role);
-
-            return Ok();
-        }
 
         private void GeneratePasswordHash(String password, out String passwordSalt, out String passwordHash)
         {
