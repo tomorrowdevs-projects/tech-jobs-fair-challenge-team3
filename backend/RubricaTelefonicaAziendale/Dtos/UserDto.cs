@@ -24,7 +24,9 @@ namespace RubricaTelefonicaAziendale.Dtos
                 Firstname = obj.Firstname,
                 Lastname = obj.Lastname,
                 Username = obj.Username,
-                Picture = obj.Picture ?? DefaultPicture
+                Picture = obj.Picture ?? DefaultPicture,
+                RoleId = obj.Role?.Id ?? String.Empty,
+                Role = obj.Role?.Description ?? String.Empty,
             };
         }
 
