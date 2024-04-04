@@ -14,14 +14,9 @@ namespace RubricaTelefonicaAziendale.Services
         Task<Users?> Register(Users user, Roles role);
 
         JwtTokenClaims? WhoAmI();
-
         Task<Boolean> ExistUserWithUsername(String username);
-
-        String GenerateToken(Users? user, Roles? role);
-
+        String GenerateToken(Users? user);
         Task<Users?> GetUserById(String userid);
-
-        Task<Roles?> GetRoleByUserId(String userid);
         Task<Roles?> GetRoleByDesc(String roledesc);
     }
 
@@ -74,6 +69,22 @@ namespace RubricaTelefonicaAziendale.Services
             return userinserted;
         }
 
+        public async Task<Users?> Update(Users user, Roles role)
+        {
+            Users? userupdated = null;
+            try
+            {
+                bool updated = await userService.Update(user);
+                if (updated)
+                    userupdated = await userService.GetByUsername(user.Username);
+            }
+            catch (Exception ex)
+            {
+                base.LogException(ex);
+            }
+            return userupdated;
+        }
+
         public JwtTokenClaims? WhoAmI()
         {
             return base.claims;
@@ -99,7 +110,7 @@ namespace RubricaTelefonicaAziendale.Services
             return (String.Compare(storedHash, hash) == 0);
         }
 
-        public String GenerateToken(Users? user, Roles? role)
+        public String GenerateToken(Users? user)
         {
             var claims = new[] {
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -107,7 +118,7 @@ namespace RubricaTelefonicaAziendale.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user?.Id?.ToString() ?? ""),
                 new Claim(ClaimTypes.Name, user?.Lastname + " " + user?.Firstname),
                 new Claim(ClaimTypes.NameIdentifier, user?.Username ?? ""),
-                new Claim(ClaimTypes.Role, role?.Description ?? "")
+                new Claim(ClaimTypes.Role, user?.Role?.Description ?? "")
             };
 
             var key = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings?.IssuerSigningKey ?? ""));
@@ -122,39 +133,6 @@ namespace RubricaTelefonicaAziendale.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private JwtTokenClaims? DecodeToken(String Token)
-        {
-            try
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                tokenHandler.ValidateToken(Token, new TokenValidationParameters
-                {
-                    ValidateAudience = false,
-                    ValidateIssuer = false,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings?.IssuerSigningKey ?? "")),
-                    ValidateLifetime = false
-                }, out SecurityToken validatedToken);
-                // check decoded token is valid
-                if (validatedToken is not JwtSecurityToken jwtToken ||
-                    !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                    return null;
-                // extract all data inside token
-                JwtTokenClaims jtc = new JwtTokenClaims();
-                jtc.UserId = jwtToken?.Claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)?.Value;
-                jtc.Fullname = jwtToken?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-                jtc.Username = jwtToken?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-                jtc.Email = jwtToken?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-                jtc.Role = jwtToken?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value;
-                return jtc;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-
         public async Task<Users?> GetUserById(String userid)
         {
             if (userid != null)
@@ -162,17 +140,6 @@ namespace RubricaTelefonicaAziendale.Services
                 Users? obj = await userService!.GetByID(userid);
                 if (obj is null) return null;
                 else return obj;
-            }
-            else return null;
-        }
-
-        public async Task<Roles?> GetRoleByUserId(String userid)
-        {
-            if (userid != null)
-            {
-                Roles? role = await roleService!.GetByUserId(userid);
-                if (role is null) return null;
-                else return role;
             }
             else return null;
         }

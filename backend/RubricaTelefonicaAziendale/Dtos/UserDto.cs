@@ -16,7 +16,7 @@ namespace RubricaTelefonicaAziendale.Dtos
         public String RoleId { get; set; } = String.Empty;
         public String Role { get; set; } = String.Empty;
 
-        public static UserDto ConvertToDto(Users obj, Roles? role)
+        public static UserDto ConvertToDto(Users obj)
         {
             return new UserDto()
             {
@@ -24,9 +24,7 @@ namespace RubricaTelefonicaAziendale.Dtos
                 Firstname = obj.Firstname,
                 Lastname = obj.Lastname,
                 Username = obj.Username,
-                Picture = obj.Picture ?? DefaultPicture,
-                RoleId = role?.Id ?? String.Empty,
-                Role = role?.Description ?? String.Empty
+                Picture = obj.Picture ?? DefaultPicture
             };
         }
 

@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -40,12 +39,10 @@ namespace RubricaTelefonicaAziendale.Controllers
             Users? user = await service.Login(model.Username, model.Password);
             if (user != null)
             {
-                Roles? role = await service.GetRoleByUserId(user?.Id ?? "");
-                if (role == null) return BadRequest("Username and password are not valid. Please contact the administrator!");
-                string jwt = service.GenerateToken(user, role);
+                string jwt = service.GenerateToken(user);
                 return Ok(new AuthDto()
                 {
-                    User = UserDto.ConvertToDto(user ?? new Users(), role),
+                    User = UserDto.ConvertToDto(user ?? new Users()),
                     Token = jwt,
                 });
             }
@@ -64,12 +61,10 @@ namespace RubricaTelefonicaAziendale.Controllers
             Users? user = await service.GetUserById(jtc!.UserId ?? "");
             if (user != null)
             {
-                Roles? role = await service.GetRoleByUserId(user?.Id ?? "");
-                if (role == null) return BadRequest("Username and password are not valid. Please contact the administrator!");
-                string jwt = service.GenerateToken(user, role);
+                string jwt = service.GenerateToken(user);
                 return Ok(new AuthDto()
                 {
-                    User = UserDto.ConvertToDto(user ?? new Users(), role),
+                    User = UserDto.ConvertToDto(user ?? new Users()),
                     Token = jwt,
                 });
             }

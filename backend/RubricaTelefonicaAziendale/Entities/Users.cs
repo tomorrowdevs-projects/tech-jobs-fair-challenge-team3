@@ -1,4 +1,7 @@
-﻿namespace RubricaTelefonicaAziendale.Entities;
+﻿using System;
+using System.Collections.Generic;
+
+namespace RubricaTelefonicaAziendale.Entities;
 
 public partial class Users
 {
@@ -15,4 +18,8 @@ public partial class Users
     public string Salt { get; set; } = null!;
 
     public string? Picture { get; set; }
+
+    public string RoleId { get; set; } = null!;
+
+    public virtual Roles Role { get; set; } = null!;
 }

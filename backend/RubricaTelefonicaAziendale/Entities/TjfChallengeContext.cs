@@ -15,16 +15,85 @@ public partial class TjfChallengeContext : DbContext
     {
     }
 
+    public virtual DbSet<ContactTypes> ContactTypes { get; set; }
+
+    public virtual DbSet<Contacts> Contacts { get; set; }
+
+    public virtual DbSet<Groups> Groups { get; set; }
+
     public virtual DbSet<Logs> Logs { get; set; }
 
-    public virtual DbSet<Roles> Roles { get; set; }
+    public virtual DbSet<People> People { get; set; }
 
-    public virtual DbSet<UserRoles> UserRoles { get; set; }
+    public virtual DbSet<Roles> Roles { get; set; }
 
     public virtual DbSet<Users> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ContactTypes>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_ContactType");
+
+            entity.Property(e => e.Id)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.Type)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Validation).HasColumnType("text");
+        });
+
+        modelBuilder.Entity<Contacts>(entity =>
+        {
+            entity.Property(e => e.Id)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.Contact)
+                .HasMaxLength(1000)
+                .IsUnicode(false);
+            entity.Property(e => e.ContactTypeId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.ContactType).WithMany(p => p.Contacts)
+                .HasForeignKey(d => d.ContactTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Contacts_ContactTypes");
+        });
+
+        modelBuilder.Entity<Groups>(entity =>
+        {
+            entity.Property(e => e.Id)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+
+            entity.HasMany(d => d.Person).WithMany(p => p.Group)
+                .UsingEntity<Dictionary<string, object>>(
+                    "PeopleGroups",
+                    r => r.HasOne<People>().WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_PeopleGroups_People"),
+                    l => l.HasOne<Groups>().WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_PeopleGroups_Groups"),
+                    j =>
+                    {
+                        j.HasKey("GroupId", "PersonId");
+                        j.IndexerProperty<string>("GroupId")
+                            .HasMaxLength(36)
+                            .IsUnicode(false);
+                        j.IndexerProperty<string>("PersonId")
+                            .HasMaxLength(36)
+                            .IsUnicode(false);
+                    });
+        });
+
         modelBuilder.Entity<Logs>(entity =>
         {
             entity.Property(e => e.Endpoint)
@@ -42,6 +111,44 @@ public partial class TjfChallengeContext : DbContext
                 .HasColumnName("Users_Id");
         });
 
+        modelBuilder.Entity<People>(entity =>
+        {
+            entity.Property(e => e.Id)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.Firstname)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.Lastname)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.Picture)
+                .HasColumnType("text")
+                .HasColumnName("picture");
+
+            entity.HasMany(d => d.Contact).WithMany(p => p.Person)
+                .UsingEntity<Dictionary<string, object>>(
+                    "PeopleContacts",
+                    r => r.HasOne<Contacts>().WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_PeopleContacts_Contacts"),
+                    l => l.HasOne<People>().WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_PeopleContacts_People"),
+                    j =>
+                    {
+                        j.HasKey("PersonId", "ContactId");
+                        j.IndexerProperty<string>("PersonId")
+                            .HasMaxLength(36)
+                            .IsUnicode(false);
+                        j.IndexerProperty<string>("ContactId")
+                            .HasMaxLength(36)
+                            .IsUnicode(false);
+                    });
+        });
+
         modelBuilder.Entity<Roles>(entity =>
         {
             entity.Property(e => e.Id)
@@ -50,18 +157,6 @@ public partial class TjfChallengeContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<UserRoles>(entity =>
-        {
-            entity.HasKey(e => new { e.UsersId, e.RolesId });
-
-            entity.Property(e => e.UsersId)
-                .HasMaxLength(36)
-                .IsUnicode(false);
-            entity.Property(e => e.RolesId)
-                .HasMaxLength(36)
                 .IsUnicode(false);
         });
 
@@ -78,10 +173,18 @@ public partial class TjfChallengeContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Password).HasColumnType("text");
             entity.Property(e => e.Picture).HasColumnType("text");
+            entity.Property(e => e.RoleId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
             entity.Property(e => e.Salt).HasColumnType("text");
             entity.Property(e => e.Username)
                 .HasMaxLength(500)
                 .IsUnicode(false);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Users_Roles");
         });
 
         OnModelCreatingPartial(modelBuilder);
