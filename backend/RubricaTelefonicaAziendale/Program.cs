@@ -1,6 +1,8 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using RubricaTelefonicaAziendale.Entities;
 using RubricaTelefonicaAziendale.Models;
 using RubricaTelefonicaAziendale.Services;
@@ -8,7 +10,38 @@ using RubricaTelefonicaAziendale.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "RubricaTelefonicaAziendale", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = @"JWT Authorization header using the Bearer scheme.<br><br> 
+                        Enter 'Bearer' [space] and then your token in the text input below.<br><br>
+                        Example: 'Bearer 12345abcdef'",
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
+});
 
 builder.Services.AddCors();
 builder.Services.AddControllers();
@@ -51,21 +84,21 @@ builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
-// builder.Services.AddScoped<IMailSettingsService, MailSettingsService>();
-// builder.Services.AddScoped<IMailTemplateService, MailTemplateService>();
-// builder.Services.AddScoped<IPersoneService, PersoneService>();
-// builder.Services.AddScoped<IPersoneIndirizziService, PersoneIndirizziService>();
-// builder.Services.AddScoped<IPersoneRecapitiService, PersoneRecapitiService>();
+builder.Services.AddScoped<IPeopleService, PeopleService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseDeveloperExceptionPage();
 //}
+
+app.UseCors(options => options.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader());
 
 app.UseHttpsRedirection();
 

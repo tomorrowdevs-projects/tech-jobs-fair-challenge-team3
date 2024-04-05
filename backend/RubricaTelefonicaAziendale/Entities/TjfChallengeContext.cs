@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace RubricaTelefonicaAziendale.Entities;
 
@@ -28,16 +26,14 @@ public partial class TjfChallengeContext : DbContext
     public virtual DbSet<Roles> Roles { get; set; }
 
     public virtual DbSet<Users> Users { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ContactTypes>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_ContactType");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .IsUnicode(false);
+            entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Type)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -46,14 +42,9 @@ public partial class TjfChallengeContext : DbContext
 
         modelBuilder.Entity<Contacts>(entity =>
         {
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .IsUnicode(false);
+            entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Contact)
                 .HasMaxLength(1000)
-                .IsUnicode(false);
-            entity.Property(e => e.ContactTypeId)
-                .HasMaxLength(36)
                 .IsUnicode(false);
 
             entity.HasOne(d => d.ContactType).WithMany(p => p.Contacts)
@@ -64,9 +55,7 @@ public partial class TjfChallengeContext : DbContext
 
         modelBuilder.Entity<Groups>(entity =>
         {
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .IsUnicode(false);
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
                 .IsUnicode(false);
@@ -85,12 +74,6 @@ public partial class TjfChallengeContext : DbContext
                     j =>
                     {
                         j.HasKey("GroupId", "PersonId");
-                        j.IndexerProperty<string>("GroupId")
-                            .HasMaxLength(36)
-                            .IsUnicode(false);
-                        j.IndexerProperty<string>("PersonId")
-                            .HasMaxLength(36)
-                            .IsUnicode(false);
                     });
         });
 
@@ -113,9 +96,7 @@ public partial class TjfChallengeContext : DbContext
 
         modelBuilder.Entity<People>(entity =>
         {
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .IsUnicode(false);
+            entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Firstname)
                 .HasMaxLength(500)
                 .IsUnicode(false);
@@ -140,20 +121,13 @@ public partial class TjfChallengeContext : DbContext
                     j =>
                     {
                         j.HasKey("PersonId", "ContactId");
-                        j.IndexerProperty<string>("PersonId")
-                            .HasMaxLength(36)
-                            .IsUnicode(false);
-                        j.IndexerProperty<string>("ContactId")
-                            .HasMaxLength(36)
-                            .IsUnicode(false);
                     });
         });
 
         modelBuilder.Entity<Roles>(entity =>
         {
             entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .IsUnicode(false)
+                .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
@@ -162,9 +136,7 @@ public partial class TjfChallengeContext : DbContext
 
         modelBuilder.Entity<Users>(entity =>
         {
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .IsUnicode(false);
+            entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Firstname)
                 .HasMaxLength(500)
                 .IsUnicode(false);
@@ -173,9 +145,6 @@ public partial class TjfChallengeContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Password).HasColumnType("text");
             entity.Property(e => e.Picture).HasColumnType("text");
-            entity.Property(e => e.RoleId)
-                .HasMaxLength(36)
-                .IsUnicode(false);
             entity.Property(e => e.Salt).HasColumnType("text");
             entity.Property(e => e.Username)
                 .HasMaxLength(500)

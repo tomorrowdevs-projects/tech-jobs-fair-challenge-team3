@@ -99,7 +99,7 @@ namespace RubricaTelefonicaAziendale.Controllers
                 // creo un nuovo utente
                 Users newuser = new Users()
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid(),
                     Firstname = model.Firstname ?? "",
                     Lastname = model.Lastname ?? "",
                     Username = model.Username,
@@ -107,8 +107,8 @@ namespace RubricaTelefonicaAziendale.Controllers
                     Salt = salt
                 };
                 // individuo il ruolo da assegnare all'utente
-                if (model?.Role == null) return BadRequest("Role not valid!");
-                Roles? role = await service.GetRoleByDesc(model.Role);
+                if (model?.RoleDesc == null) return BadRequest("Role not valid!");
+                Roles? role = await service.GetRoleByDesc(model.RoleDesc);
                 if (role == null) return BadRequest("Role not found!");
                 await service.Register(newuser, role);
                 return Ok("User created!");
@@ -148,7 +148,7 @@ namespace RubricaTelefonicaAziendale.Controllers
                 {
                     return BadRequest("User not found!");
                 }
-                updateuser.Id = Guid.NewGuid().ToString();
+                //updateuser.Id = Guid.NewGuid().ToString();
                 updateuser.Firstname = model.Firstname ?? "";
                 updateuser.Lastname = model.Lastname ?? "";
                 updateuser.Username = model.Username;
@@ -160,8 +160,8 @@ namespace RubricaTelefonicaAziendale.Controllers
                     updateuser.Salt = salt;
                 }
                 // individuo il ruolo da assegnare all'utente
-                if (model?.Role == null) return BadRequest("Role not valid!");
-                Roles? role = await service.GetRoleByDesc(model.Role);
+                if (model?.RoleDesc == null) return BadRequest("Role not valid!");
+                Roles? role = await service.GetRoleByDesc(model.RoleDesc);
                 if (role == null) return BadRequest("Role not found!");
                 await service.Register(updateuser, role);
                 return Ok("User updated!");

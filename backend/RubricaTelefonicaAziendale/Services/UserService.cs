@@ -32,7 +32,7 @@ namespace RubricaTelefonicaAziendale.Services
             Users? obj = null;
             try
             {
-                obj = await this.db.Users.FindAsync(id.ToLower());
+                obj = await this.db.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.Id.ToString() == id);
             }
             catch (Exception ex)
             {
@@ -46,6 +46,7 @@ namespace RubricaTelefonicaAziendale.Services
             try
             {
                 obj = await this.db.Users.AsNoTracking()
+                                            .Include(x => x.Role)
                                             .Where(c => c.Username == username)
                                             .FirstOrDefaultAsync();
             }

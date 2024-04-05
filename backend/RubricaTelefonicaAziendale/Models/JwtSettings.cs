@@ -1,8 +1,6 @@
-using System;
-
 namespace RubricaTelefonicaAziendale.Models
 {
-        public class JwtSettings
+    public class JwtSettings
     {
         public Boolean ValidateIssuerSigningKey { get; set; }
         public String IssuerSigningKey { get; set; } = String.Empty;

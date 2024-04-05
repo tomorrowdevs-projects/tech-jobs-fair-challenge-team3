@@ -24,7 +24,7 @@ namespace RubricaTelefonicaAziendale.Services
         {
             if (this.db.Roles == null) return null;
             return await this.db.Roles.AsNoTracking()
-                                        .Where(c => c.Id == id)
+                                        .Where(c => c.Id.ToString() == id)
                                         .FirstOrDefaultAsync();
         }
 

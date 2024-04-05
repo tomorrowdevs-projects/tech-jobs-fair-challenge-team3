@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace RubricaTelefonicaAziendale.Entities;
+﻿namespace RubricaTelefonicaAziendale.Entities;
 
 public partial class Contacts
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
-    public string ContactTypeId { get; set; } = null!;
+    public Guid ContactTypeId { get; set; }
 
     public string? Contact { get; set; }
 

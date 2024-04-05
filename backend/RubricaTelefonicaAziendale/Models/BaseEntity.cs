@@ -1,5 +1,3 @@
-using System;
-
 namespace RubricaTelefonicaAziendale.Models
 {
     public class BaseEntity

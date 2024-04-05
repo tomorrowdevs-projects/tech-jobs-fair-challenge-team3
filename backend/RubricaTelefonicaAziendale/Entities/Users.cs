@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace RubricaTelefonicaAziendale.Entities;
+﻿namespace RubricaTelefonicaAziendale.Entities;
 
 public partial class Users
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
     public string Firstname { get; set; } = null!;
 
@@ -19,7 +16,7 @@ public partial class Users
 
     public string? Picture { get; set; }
 
-    public string RoleId { get; set; } = null!;
+    public Guid RoleId { get; set; }
 
     public virtual Roles Role { get; set; } = null!;
 }

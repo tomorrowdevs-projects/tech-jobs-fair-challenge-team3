@@ -33,13 +33,16 @@ namespace RubricaTelefonicaAziendale.Services
         {
             try
             {
+                Token = Token?.Substring(7);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 tokenHandler.ValidateToken(Token, new TokenValidationParameters
                 {
-                    ValidateAudience = false,
-                    ValidateIssuer = false,
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings?.ValidAudience ?? "",
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings?.ValidIssuer ?? "",
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings?.IssuerSigningKey ?? "")),
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings?.IssuerSigningKey ?? "")),
                     ValidateLifetime = false
                 }, out SecurityToken validatedToken);
                 // check decoded token is valid
@@ -49,11 +52,11 @@ namespace RubricaTelefonicaAziendale.Services
                 // extract all data inside token
                 JwtTokenClaims jtc = new()
                 {
-                    UserId = jwtToken?.Claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)?.Value,
-                    Fullname = jwtToken?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value,
-                    Username = jwtToken?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value,
-                    Email = jwtToken?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value,
-                    Role = jwtToken?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value
+                    UserId = jwtToken?.Claims?.FirstOrDefault(x => x.Type == "id")?.Value,
+                    Fullname = jwtToken?.Claims?.FirstOrDefault(x => x.Type == "fullname")?.Value,
+                    Username = jwtToken?.Claims?.FirstOrDefault(x => x.Type == "username")?.Value,
+                    RoleId = jwtToken?.Claims?.FirstOrDefault(x => x.Type == "role-id")?.Value,
+                    Role = jwtToken?.Claims?.FirstOrDefault(x => x.Type == "role")?.Value
                 };
                 return jtc;
             }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace RubricaTelefonicaAziendale.Entities;
+﻿namespace RubricaTelefonicaAziendale.Entities;
 
 public partial class Logs
 {

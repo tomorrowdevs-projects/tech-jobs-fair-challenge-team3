@@ -112,25 +112,27 @@ namespace RubricaTelefonicaAziendale.Services
 
         public String GenerateToken(Users? user)
         {
-            var claims = new[] {
+            Claim[] claims = [
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, user?.Id?.ToString() ?? ""),
-                new Claim(ClaimTypes.Name, user?.Lastname + " " + user?.Firstname),
-                new Claim(ClaimTypes.NameIdentifier, user?.Username ?? ""),
-                new Claim(ClaimTypes.Role, user?.Role?.Description ?? "")
+                new Claim("id", user?.Id.ToString() ?? ""),
+                new Claim("fullname", user?.Lastname + " " + user?.Firstname),
+                new Claim("username", user?.Username ?? ""),
+                new Claim("role-id", user?.Role?.Id.ToString() ?? ""),
+                new Claim("role", user?.Role?.Description ?? ""),
+            ];
+            JwtSecurityTokenHandler tokenHandler = new();
+            Byte[] key = System.Text.Encoding.UTF8.GetBytes(jwtSettings?.IssuerSigningKey ?? "");
+            SecurityTokenDescriptor tokenDescriptor = new()
+            {
+                Issuer = jwtSettings?.ValidIssuer ?? "",
+                Audience = jwtSettings?.ValidAudience ?? "",
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(15),
             };
-
-            var key = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings?.IssuerSigningKey ?? ""));
-            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
-                jwtSettings?.ValidIssuer ?? "",
-                jwtSettings?.ValidAudience ?? "",
-                claims,
-                expires: DateTime.UtcNow.AddMinutes(10),
-                signingCredentials: signIn);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         public async Task<Users?> GetUserById(String userid)

@@ -53,8 +53,11 @@ namespace RubricaTelefonicaAziendale.Models
                         T obj = Activator.CreateInstance<T>();
                         foreach (PropertyInfo prop in props)
                         {
-                            object? val = reader.GetValue(colMapping![prop!.Name!.ToLower()].ColumnOrdinal!.Value);
-                            prop.SetValue(obj, val == DBNull.Value ? null : val);
+                            if (colMapping.Keys.Contains(prop.Name))
+                            {
+                                object? val = reader.GetValue(colMapping![prop!.Name!.ToLower()].ColumnOrdinal!.Value);
+                                prop.SetValue(obj, val == DBNull.Value ? null : val);
+                            }
                         }
                         objList.Add(obj);
                     }
