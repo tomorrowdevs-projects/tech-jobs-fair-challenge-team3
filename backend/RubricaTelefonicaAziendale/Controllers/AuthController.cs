@@ -12,14 +12,9 @@ namespace RubricaTelefonicaAziendale.Controllers
     [ApiController]
     [Produces("application/json")]
     [Route("web/auth")]
-    public class AuthController : ControllerBase
+    public class AuthController(IAuthService authService) : ControllerBase
     {
-        private readonly IAuthService service;
-
-        public AuthController(IAuthService authService)
-        {
-            service = authService;
-        }
+        private readonly IAuthService service = authService;
 
         [HttpPost("login")]
         [ProducesResponseType(typeof(AuthDto), StatusCodes.Status200OK)]
@@ -49,7 +44,6 @@ namespace RubricaTelefonicaAziendale.Controllers
             return Problem("Username and password are not valid. Please contact the administrator!");
         }
 
-
         [HttpGet("whoami")]
         [ProducesResponseType(typeof(AuthDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -71,12 +65,35 @@ namespace RubricaTelefonicaAziendale.Controllers
             return Problem("Username and password are not valid. Please contact the administrator!");
         }
 
-
-        [HttpPost("register")]
+        [HttpPost("passwordforgot")]
         [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult<AuthDto>> Register([FromBody] UserDto model)
+        public async Task<ActionResult> PasswordForgot([FromBody] String email)
+        {
+            await System.Threading.Tasks.Task.Delay(1000);
+            return BadRequest();
+        }
+
+        [HttpGet("passwordreset")]
+        [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult> PasswordReset(String token)
+        {
+            if (String.IsNullOrEmpty(token))
+                return BadRequest("Token not received");
+
+            await System.Threading.Tasks.Task.Delay(1000); ;
+            return BadRequest();
+        }
+
+
+        [HttpPost("insert")]
+        [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult<AuthDto>> Insert([FromBody] UserDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -110,7 +127,7 @@ namespace RubricaTelefonicaAziendale.Controllers
                 if (model?.RoleDesc == null) return BadRequest("Role not valid!");
                 Roles? role = await service.GetRoleByDesc(model.RoleDesc);
                 if (role == null) return BadRequest("Role not found!");
-                await service.Register(newuser, role);
+                await service.Register(newuser);
                 return Ok("User created!");
             }
             catch (Exception ex)
@@ -118,7 +135,6 @@ namespace RubricaTelefonicaAziendale.Controllers
                 return Problem("Error creating user! " + ex.Message);
             }
         }
-
 
         [HttpPost("update")]
         [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
@@ -163,7 +179,7 @@ namespace RubricaTelefonicaAziendale.Controllers
                 if (model?.RoleDesc == null) return BadRequest("Role not valid!");
                 Roles? role = await service.GetRoleByDesc(model.RoleDesc);
                 if (role == null) return BadRequest("Role not found!");
-                await service.Register(updateuser, role);
+                await service.Register(updateuser);
                 return Ok("User updated!");
             }
             catch (Exception ex)
@@ -172,31 +188,23 @@ namespace RubricaTelefonicaAziendale.Controllers
             }
         }
 
-
-        [HttpPost("passwordforgot")]
-        [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
+        [HttpDelete("delete")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult> PasswordForgot([FromBody] String email)
+        public async Task<ActionResult> Delete([FromForm] String id)
         {
-            await System.Threading.Tasks.Task.Delay(1000);
-            return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                var errors = (from item in ModelState where item.Value.Errors.Any() select item.Value.Errors[0].ErrorMessage).ToList();
+                return BadRequest("Problems with received data! " + String.Join(";", errors.ToArray()));
+            }
+            bool delete = await service.Delete(id);
+            if (delete)
+                return Ok("Assistance contract deleted successfully");
+            else
+                return Problem("Error deleting selected item!");
         }
-
-
-        [HttpGet("passwordreset")]
-        [ProducesResponseType(typeof(IdentityResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(IEnumerable<IdentityError>), StatusCodes.Status400BadRequest)]
-        [ProducesDefaultResponseType]
-        public async Task<ActionResult> PasswordReset(String token)
-        {
-            if (String.IsNullOrEmpty(token))
-                return BadRequest("Token not received");
-
-            await System.Threading.Tasks.Task.Delay(1000); ;
-            return BadRequest();
-        }
-
 
 
         private void GeneratePasswordHash(String password, out String passwordSalt, out String passwordHash)

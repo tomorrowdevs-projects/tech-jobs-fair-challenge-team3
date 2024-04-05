@@ -11,7 +11,9 @@ namespace RubricaTelefonicaAziendale.Services
     public interface IAuthService
     {
         Task<Users?> Login(String username, String password);
-        Task<Users?> Register(Users user, Roles role);
+        Task<Users?> Register(Users user);
+        Task<Users?> Update(Users user);
+        Task<Boolean> Delete(String id);
 
         JwtTokenClaims? WhoAmI();
         Task<Boolean> ExistUserWithUsername(String username);
@@ -53,7 +55,7 @@ namespace RubricaTelefonicaAziendale.Services
             return user;
         }
 
-        public async Task<Users?> Register(Users user, Roles role)
+        public async Task<Users?> Register(Users user)
         {
             Users? userinserted = null;
             try
@@ -69,7 +71,7 @@ namespace RubricaTelefonicaAziendale.Services
             return userinserted;
         }
 
-        public async Task<Users?> Update(Users user, Roles role)
+        public async Task<Users?> Update(Users user)
         {
             Users? userupdated = null;
             try
@@ -83,6 +85,23 @@ namespace RubricaTelefonicaAziendale.Services
                 base.LogException(ex);
             }
             return userupdated;
+        }
+
+        public async Task<Boolean> Delete(String id)
+        {
+            int res = -1;
+            try
+            {
+                Users? user = await GetUserById(id);
+                if (user == null) return res > 0;
+                this.db.Remove(user);
+                res = await this.db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                base.LogException(ex);
+            }
+            return res > 0;
         }
 
         public JwtTokenClaims? WhoAmI()
