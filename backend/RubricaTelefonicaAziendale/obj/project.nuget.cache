@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "Jy5fKeAjOHewRGuwlCz6WkjRRkVJ5X73ergs7eksCLkbQX5lvp1p/mOaZeYpPIRvJkc6y2fTh1/KA8U6g/tZNA==",
+  "dgSpecHash": "BS2wBFehPbu8CfZCFxLgDUxHLJh9t1+u9sy3KHbagFJaS/rN0OxTUrBV4b5u8LDSotlsl0m99i1/GoGJzxedEA==",
   "success": true,
   "projectFilePath": "/Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/RubricaTelefonicaAziendale.csproj",
   "expectedPackageFiles": [
     "/Users/michele/.nuget/packages/azure.core/1.35.0/azure.core.1.35.0.nupkg.sha512",
     "/Users/michele/.nuget/packages/azure.identity/1.10.3/azure.identity.1.10.3.nupkg.sha512",
+    "/Users/michele/.nuget/packages/fleck/1.2.0/fleck.1.2.0.nupkg.sha512",
     "/Users/michele/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/michele/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.3/microsoft.aspnetcore.authentication.jwtbearer.8.0.3.nupkg.sha512",
     "/Users/michele/.nuget/packages/microsoft.aspnetcore.openapi/8.0.3/microsoft.aspnetcore.openapi.8.0.3.nupkg.sha512",

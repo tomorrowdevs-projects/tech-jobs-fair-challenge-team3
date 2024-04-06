@@ -138,3 +138,4 @@
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/obj/Release/net8.0/RubricaTelefonicaAziendale.genruntimeconfig.cache
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/obj/Release/net8.0/ref/RubricaTelefonicaAziendale.dll
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/obj/Release/net8.0/RubricaTelefonicaAziendale.sourcelink.json
+/Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/bin/Release/net8.0/Fleck.dll

@@ -29,10 +29,10 @@ namespace RubricaTelefonicaAziendale.Dtos
                 IsEmployee = obj?.IsEmployee == true,
                 IsCustomer = obj?.IsCustomer == true,
                 IsPartner = obj?.IsPartner == true,
-                PhoneNumber = obj?.Contact?.FirstOrDefault(x => x.ContactType.Type.ToUpper().Contains("PHONE"))?.ToString(),
-                Email = obj?.Contact?.FirstOrDefault(x => x.ContactType.Type.ToUpper().Contains("EMAIL"))?.ToString(),
-                Address = obj?.Contact?.FirstOrDefault(x => x.ContactType.Type.ToUpper().Contains("ADDRESS"))?.ToString(),
-                SocialAccount = obj?.Contact?.FirstOrDefault(x => x.ContactType.Type.ToUpper().Contains("ACCOUNT"))?.ToString(),
+                PhoneNumber = obj?.Contact?.FirstOrDefault(x => x.ContactType.Type.ToUpper().Contains("PHONE"))?.Contact?.ToString(),
+                Email = obj?.Contact?.FirstOrDefault(x => x.ContactType.Type.ToUpper().Contains("EMAIL"))?.Contact?.ToString(),
+                Address = obj?.Contact?.FirstOrDefault(x => x.ContactType.Type.ToUpper().Contains("ADDRESS"))?.Contact?.ToString(),
+                SocialAccount = obj?.Contact?.FirstOrDefault(x => x.ContactType.Type.ToUpper().Contains("ACCOUNT"))?.Contact?.ToString(),
                 Groups = String.Join(", ", obj?.Group ?? new List<Groups>())
             };
         }

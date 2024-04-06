@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RubricaTelefonicaAziendale")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+261fd515441864b9a96c056db57c03d7d484ca8c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6521ff8c4cfe9054a6e50ff856eab90b9e3caca7")]
 [assembly: System.Reflection.AssemblyProductAttribute("RubricaTelefonicaAziendale")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RubricaTelefonicaAziendale")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

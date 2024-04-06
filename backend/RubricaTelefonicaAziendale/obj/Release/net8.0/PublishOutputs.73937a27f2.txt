@@ -7,6 +7,7 @@
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/bin/Release/net8.0/publish/RubricaTelefonicaAziendale.pdb
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/bin/Release/net8.0/publish/Azure.Core.dll
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/bin/Release/net8.0/publish/Azure.Identity.dll
+/Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/bin/Release/net8.0/publish/Fleck.dll
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/bin/Release/net8.0/publish/Humanizer.dll
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/bin/Release/net8.0/publish/Microsoft.AspNetCore.Authentication.JwtBearer.dll
 /Users/michele/Works/TJF_Challenge/backend/RubricaTelefonicaAziendale/bin/Release/net8.0/publish/Microsoft.AspNetCore.OpenApi.dll

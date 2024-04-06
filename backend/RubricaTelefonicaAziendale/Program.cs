@@ -1,11 +1,32 @@
-using System.Reflection;
+using Fleck;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using RubricaTelefonicaAziendale.Entities;
+using RubricaTelefonicaAziendale.Handlers;
 using RubricaTelefonicaAziendale.Models;
 using RubricaTelefonicaAziendale.Services;
+
+// Inizializzo un websocket
+var WsServer = new WebSocketServer("ws://0.0.0.0:1402");
+WsServer.Start(ws =>
+{
+    ws.OnOpen = () =>
+    {
+        WebSocketHandler.WsConnections.Add(ws);
+    };
+    ws.OnMessage = message =>
+    {
+        WsMessage? msg = JsonConvert.DeserializeObject<WsMessage>(message);
+        if (msg != null) WebSocketHandler.WsMessageIn.Add(msg);
+    };
+    ws.OnError = error =>
+    {
+        // salvo nei logs
+    };
+});
 
 var builder = WebApplication.CreateBuilder(args);
 

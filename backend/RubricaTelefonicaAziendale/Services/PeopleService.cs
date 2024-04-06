@@ -67,7 +67,10 @@ namespace RubricaTelefonicaAziendale.Services
 
 
 
-                dynamic results = await base.db.People.Skip(start).Take(length).ToListAsync();
+                dynamic results = await base.db.People.Include(x=>x.Contact).ThenInclude(x=>x.ContactType)
+                                                        .Include(x=>x.Group)
+                                                        .Skip(start).Take(length)
+                                                        .ToListAsync();
                 List<PeopleDto> dtos = new List<PeopleDto>();
                 foreach (People p in results)
                 {
