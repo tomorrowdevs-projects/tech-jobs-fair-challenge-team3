@@ -9,7 +9,7 @@ namespace RubricaTelefonicaAziendale.Services
     public interface IPeopleService
     {
         // GET
-        Task<ListDto<PeopleDto>> GetListAsync();
+        Task<ListDto<PeopleDto>> GetListAsync(PeopleListRequest request);
         Task<People?> GetByID(String id);
 
         // CRUD
@@ -28,7 +28,7 @@ namespace RubricaTelefonicaAziendale.Services
         { }
 
         // GET
-        public async Task<ListDto<PeopleDto>> GetListAsync()
+        public async Task<ListDto<PeopleDto>> GetListAsync(PeopleListRequest request)
         {
             ListDto<PeopleDto> response = new();
             try
@@ -60,7 +60,14 @@ namespace RubricaTelefonicaAziendale.Services
                 // sp_params.Add(new() { ParamName = "@Length", ParamValue = request.EntriesPerPage, ParamType = DbType.Int32 });
 
                 // dynamic results = await sph.ExecuteStoredProcedure<People>("PeopleGetList", sp_params);
-                dynamic results = await base.db.People.ToListAsync();
+
+                if (request.EntriesPerPage == 0) request.EntriesPerPage = 10;
+                int start = request.Page * request.EntriesPerPage;
+                int length = (request.Page + 1) * request.EntriesPerPage;
+
+
+
+                dynamic results = await base.db.People.Skip(start).Take(length).ToListAsync();
                 List<PeopleDto> dtos = new List<PeopleDto>();
                 foreach (People p in results)
                 {
@@ -77,7 +84,6 @@ namespace RubricaTelefonicaAziendale.Services
             }
             return response;
         }
-
         public async Task<People?> GetByID(String id)
         {
             People? obj = null;

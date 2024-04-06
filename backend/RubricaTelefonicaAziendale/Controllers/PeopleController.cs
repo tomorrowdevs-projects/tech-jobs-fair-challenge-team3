@@ -7,7 +7,7 @@ using RubricaTelefonicaAziendale.Services;
 namespace RubricaTelefonicaAziendale.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Produces("application/json")]
     [Route("web/people")]
     public class PeopleController : ControllerBase
@@ -29,7 +29,7 @@ namespace RubricaTelefonicaAziendale.Controllers
                 var errors = (from item in ModelState where item.Value.Errors.Any() select item.Value.Errors[0].ErrorMessage).ToList();
                 return BadRequest("Problems with received data! " + String.Join(";", [.. errors]));
             }
-            ListDto<PeopleDto>? response = await service.GetListAsync();
+            ListDto<PeopleDto>? response = await service.GetListAsync(request);
             if (response != null) return Ok(response);
             else return Problem("Error retrieving data!");
         }
