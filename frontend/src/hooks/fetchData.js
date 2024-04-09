@@ -26,11 +26,11 @@ const useContacts = (currentPage) => {
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`)
+            } else {
+                const data = await response.json()
+                setLocalContacts(data.data)
+                setTotContacts(data.recordsTotal)
             }
-
-            const data = await response.json()
-            setLocalContacts(data.data)
-            setTotContacts(data.recordsTotal)
         } catch (error) {
             console.error("Error fetching data:", error)
             setError(error)

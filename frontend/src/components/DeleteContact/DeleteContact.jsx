@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from "react"
+import React, { forwardRef } from "react"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { usePage } from "../../context/PageContext"
@@ -15,13 +15,6 @@ const DeleteContact = forwardRef((props, ref) => {
     const { currentPage } = usePage()
 
     const { fetchContacts } = useContacts(currentPage)
-    const [deletedContacts, setDeletedContacts] = useState(false)
-
-    useEffect(() => {
-        if (deletedContacts) {
-            fetchContacts()
-        }
-    }, [deletedContacts, fetchContacts])
 
     //Confirm before deleting
     const handleConfirm = async () => {
@@ -50,7 +43,7 @@ const DeleteContact = forwardRef((props, ref) => {
                 if (response.ok) {
                     const data = await response.json()
                     resolve(data)
-                    setDeletedContacts(true)
+                    // fetchContacts()
                 } else {
                     reject(new Error(`HTTP error! Status: ${response.status}`))
                 }
@@ -65,7 +58,6 @@ const DeleteContact = forwardRef((props, ref) => {
             error: "Something went wrong",
         })
     }
-    console.log(deletedContacts)
     return (
         <>
             <button
