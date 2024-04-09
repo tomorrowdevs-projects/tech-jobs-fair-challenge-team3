@@ -40,7 +40,7 @@ const ContactList = () => {
                     <td className="hidden lg:table-cell px-4 py-3">
                         {contact.socialAccount}
                     </td>
-                    <td className="px-4 py-3 flex items-center justify-end">
+                    <td className="relative px-4 py-3 flex items-center justify-end">
                         <DropdownContact contactId={contact.id} />
                     </td>
                 </tr>

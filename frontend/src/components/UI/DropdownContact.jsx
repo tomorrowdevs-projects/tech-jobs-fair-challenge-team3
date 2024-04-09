@@ -46,8 +46,8 @@ export default function Dropdown(props) {
                     leaveTo="transform opacity-0 scale-95"
                 >
                     <Menu.Items
-                        className="absolute z-10 w-44 bg-neutral rounded divide-y divide-vivid shadow dark:bg-neutral dark:divide-subdue"
-                        style={{ left: "-150px" }}
+                        className="absolute w-44 bg-neutral rounded divide-y divide-vivid shadow dark:bg-neutral dark:divide-subdue"
+                        style={{ left: "-150px", top: "100%" }}
                     >
                         <div className="flex flex-col py-1 text-sm text-vivid dark:text-neutral">
                             <Menu.Item>
