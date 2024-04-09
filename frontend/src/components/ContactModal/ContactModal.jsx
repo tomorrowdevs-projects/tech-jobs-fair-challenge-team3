@@ -120,8 +120,7 @@ const CardComponent = (props) => {
 
     const fetchContact = useCallback(async () => {
         if (!selectedContactId) {
-            console.log("no ID")
-            //aggiungere gestione errore
+            return
         }
         try {
             const response = await fetch(

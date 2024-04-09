@@ -14,7 +14,6 @@ export default function Dropdown(props) {
         setModalToggle(true)
         setSelectedContactId(contactId)
     }
-    console.log(selectedContactId)
     return (
         <>
             <Menu as="div" className="relative inline-block text-left">

@@ -8,10 +8,9 @@ const filters = [
     { name: "Partner" },
 ]
 export default function DropdownFilters(props) {
-    const { filter, setFilter } = props
+    const { setFilter } = props
     const [selected, setSelected] = useState(filters[0])
 
-    console.log()
     return (
         <div className="relative inline-block text-left">
             <Listbox value={selected} onChange={setSelected}>

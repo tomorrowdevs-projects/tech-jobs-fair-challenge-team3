@@ -9,7 +9,6 @@ const Searchbar = () => {
     const { setLocalContacts } = useContacts(currentPage)
     const handleSearch = async (e) => {
         e.preventDefault()
-        console.log("domanda:", query)
 
         const searchPayload = {
             firstname: query,
@@ -66,12 +65,7 @@ const Searchbar = () => {
                         placeholder="Search"
                         required=""
                         value={query}
-                        onChange={(e) =>
-                            setQuery(
-                                e.target.value,
-                                console.log(e.target.value)
-                            )
-                        }
+                        onChange={(e) => setQuery(e.target.value)}
                     />
                 </div>
             </form>
